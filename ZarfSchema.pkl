@@ -1,0 +1,669 @@
+/// ZarfPackage the top-level structure of a Zarf config file.
+///
+/// This module was generated from JSON Schema from
+/// <https://raw.githubusercontent.com/zarf-dev/zarf/refs/tags/v0.59.0/zarf.schema.json>.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+module ZarfSchema
+
+/// The API version of the Zarf package.
+apiVersion: "zarf.dev/v1alpha1"?
+
+/// The kind of Zarf package.
+///
+/// Default if undefined: `"ZarfPackageConfig"`
+kind: "ZarfInitConfig"|"ZarfPackageConfig"
+
+/// Package metadata.
+metadata: ZarfMetadata?
+
+/// Zarf-generated package build data.
+build: ZarfBuildData?
+
+/// List of components to deploy in this package.
+components: Listing<ZarfComponent>(!isEmpty)
+
+/// Constant template values applied on deploy for K8s resources.
+constants: Listing<Constant>?
+
+/// Variable template values applied on deploy for K8s resources.
+variables: Listing<InteractiveVariable>?
+
+/// Constant are constants that can be used to dynamically template K8s resources or run in actions.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class Constant {
+  /// The name to be used for the constant
+  name: String(matches(Regex("^[A-Z0-9_]+$")))
+
+  /// The value to set for the constant during deploy
+  value: String
+
+  /// A description of the constant to explain its purpose on package create or deploy confirmation
+  /// prompts
+  description: String?
+
+  /// Whether to automatically indent the variable's value (if multiline) when templating. Based on the
+  /// number of chars before the start of ###ZARF_CONST_.
+  autoIndent: Boolean?
+
+  /// An optional regex pattern that a constant value must match before a package can be created.
+  pattern: String?
+}
+
+/// DeprecatedZarfComponentScripts are scripts that run before or after a component is deployed.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class DeprecatedZarfComponentScripts {
+  /// Show the output of the script during package deployment.
+  showOutput: Boolean?
+
+  /// Timeout in seconds for the script.
+  timeoutSeconds: Int?
+
+  /// Retry the script if it fails.
+  retry: Boolean?
+
+  /// Scripts to run before the component is added during package create.
+  prepare: Listing<String>?
+
+  /// Scripts to run before the component is deployed.
+  before: Listing<String>?
+
+  /// Scripts to run after the component successfully deploys.
+  after: Listing<String>?
+}
+
+/// InteractiveVariable is a variable that can be used to prompt a user for more information
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class InteractiveVariable {
+  /// The name to be used for the variable
+  name: String(matches(Regex("^[A-Z0-9_]+$")))
+
+  /// Whether to mark this variable as sensitive to not print it in the log
+  sensitive: Boolean?
+
+  /// Whether to automatically indent the variable's value (if multiline) when templating. Based on the
+  /// number of chars before the start of ###ZARF_VAR_.
+  autoIndent: Boolean?
+
+  /// An optional regex pattern that a variable value must match before a package deployment can
+  /// continue.
+  pattern: String?
+
+  /// Changes the handling of a variable to load contents differently (i.e. from a file rather than as a
+  /// raw variable - templated files should be kept below 1 MiB)
+  type: ("raw"|"file")?
+
+  /// A description of the variable to be used when prompting the user a value
+  description: String?
+
+  /// The default value to use for the variable
+  default: String?
+
+  /// Whether to prompt the user for input for this variable
+  prompt: Boolean?
+}
+
+/// NamespacedObjectKindReference is a reference to a specific resource in a namespace using its kind and
+/// API version.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class NamespacedObjectKindReference {
+  /// API Version of the resource
+  apiVersion: String
+
+  /// Kind of the resource
+  kind: String
+
+  /// Namespace of the resource
+  namespace: String
+
+  /// Name of the resource
+  name: String
+}
+
+/// Shell represents the desired shell to use for a given command
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class Shell {
+  /// (default 'powershell') Indicates a preference for the shell to use on Windows systems (note that
+  /// choosing 'cmd' will turn off migrations like touch -> New-Item)
+  windows: String?
+
+  /// (default 'sh') Indicates a preference for the shell to use on Linux systems
+  linux: String?
+
+  /// (default 'sh') Indicates a preference for the shell to use on macOS systems
+  darwin: String?
+}
+
+/// Variable represents a variable that has a value set programmatically
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class Variable {
+  /// The name to be used for the variable
+  name: String(matches(Regex("^[A-Z0-9_]+$")))
+
+  /// Whether to mark this variable as sensitive to not print it in the log
+  sensitive: Boolean?
+
+  /// Whether to automatically indent the variable's value (if multiline) when templating. Based on the
+  /// number of chars before the start of ###ZARF_VAR_.
+  autoIndent: Boolean?
+
+  /// An optional regex pattern that a variable value must match before a package deployment can
+  /// continue.
+  pattern: String?
+
+  /// Changes the handling of a variable to load contents differently (i.e. from a file rather than as a
+  /// raw variable - templated files should be kept below 1 MiB)
+  type: ("raw"|"file")?
+}
+
+/// ZarfBuildData is written during the packager.Create() operation to track details of the created
+/// package.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfBuildData {
+  /// The machine name that created this package.
+  terminal: String
+
+  /// The username who created this package.
+  user: String
+
+  /// The architecture this package was created on.
+  architecture: String
+
+  /// The timestamp when this package was created.
+  timestamp: String
+
+  /// The version of Zarf used to build this package.
+  version: String
+
+  /// Any migrations that have been run on this package.
+  migrations: Listing<String>?
+
+  /// Any registry domains that were overridden on package create when pulling images.
+  registryOverrides: Mapping<String, String>?
+
+  /// Whether this package was created with differential components.
+  differential: Boolean?
+
+  /// Version of a previously built package used as the basis for creating this differential package.
+  differentialPackageVersion: String?
+
+  /// List of components that were not included in this package due to differential packaging.
+  differentialMissing: Listing<String>?
+
+  /// The minimum version of Zarf that does not have breaking package structure changes.
+  lastNonBreakingVersion: String?
+
+  /// The flavor of Zarf used to build this package.
+  flavor: String?
+}
+
+/// ZarfChart defines a helm chart to be deployed.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfChart {
+  /// The name of the chart within Zarf; note that this must be unique and does not need to be the same
+  /// as the name in the chart repo.
+  name: String
+
+  /// The version of the chart to deploy; for git-based charts this is also the tag of the git repo by
+  /// default (when not using the '@' syntax for 'repos').
+  version: String?
+
+  /// The URL of the OCI registry, chart repository, or git repo where the helm chart is stored.
+  url: String?
+
+  /// The name of a chart within a Helm repository (defaults to the Zarf name of the chart).
+  repoName: String?
+
+  /// (git repo only) The sub directory to the chart within a git repo.
+  gitPath: String?
+
+  /// The path to a local chart's folder or .tgz archive.
+  localPath: String?
+
+  /// The namespace to deploy the chart to.
+  namespace: String?
+
+  /// The name of the Helm release to create (defaults to the Zarf name of the chart).
+  releaseName: String?
+
+  /// Whether to not wait for chart resources to be ready before continuing.
+  noWait: Boolean?
+
+  /// List of local values file paths or remote URLs to include in the package; these will be merged
+  /// together when deployed.
+  valuesFiles: Listing<String>?
+
+  /// [alpha] List of variables to set in the Helm chart.
+  variables: Listing<ZarfChartVariable>?
+
+  /// Whether or not to validate the values.yaml schema, defaults to true. Necessary in the air-gap when
+  /// the JSON Schema references resources on the internet.
+  schemaValidation: Boolean?
+}
+
+/// ZarfChartVariable represents a variable that can be set for a Helm chart overrides.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfChartVariable {
+  /// The name of the variable.
+  name: String(matches(Regex("^[A-Z0-9_]+$")))
+
+  /// A brief description of what the variable controls.
+  description: String
+
+  /// The path within the Helm chart values where this variable applies.
+  path: String
+}
+
+/// ZarfComponent is the primary functional grouping of assets to deploy by Zarf.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponent {
+  /// The name of the component.
+  name: String(matches(Regex(#"^[a-z0-9][a-z0-9\-]*$"#)))
+
+  /// Message to include during package deploy describing the purpose of this component.
+  description: String?
+
+  /// Determines the default Y/N state for installing this component on package deploy.
+  default: Boolean?
+
+  /// Do not prompt user to install this component.
+  required: Boolean?
+
+  /// Filter when this component is included in package creation or deployment.
+  only: ZarfComponentOnlyTarget?
+
+  /// [Deprecated] Create a user selector field based on all components in the same group. This will be
+  /// removed in Zarf v1.0.0. Consider using 'only.flavor' instead.
+  group: String?
+
+  /// [Deprecated] Specify a path to a public key to validate signed online resources. This will be
+  /// removed in Zarf v1.0.0.
+  cosignKeyPath: String?
+
+  /// Import a component from another Zarf package.
+  `import`: ZarfComponentImport?
+
+  /// Kubernetes manifests to be included in a generated Helm chart on package deploy.
+  manifests: Listing<ZarfManifest>?
+
+  /// Helm charts to install during package deploy.
+  charts: Listing<ZarfChart>?
+
+  /// Datasets to inject into a container in the target cluster.
+  dataInjections: Listing<ZarfDataInjection>?
+
+  /// Files or folders to place on disk during package deployment.
+  files: Listing<ZarfFile>?
+
+  /// List of OCI images to include in the package.
+  images: Listing<String>?
+
+  /// List of git repos to include in the package.
+  repos: Listing<String>?
+
+  /// [Deprecated] (replaced by actions) Custom commands to run before or after package deployment. This
+  /// will be removed in Zarf v1.0.0.
+  scripts: DeprecatedZarfComponentScripts?
+
+  /// Custom commands to run at various stages of a package lifecycle.
+  actions: ZarfComponentActions?
+
+  /// List of resources to health check after deployment
+  healthChecks: Listing<NamespacedObjectKindReference>?
+}
+
+/// ZarfComponentAction represents a single action to run during a zarf package operation.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentAction {
+  /// Hide the output of the command during package deployment (default false).
+  mute: Boolean?
+
+  /// Timeout in seconds for the command (default to 0, no timeout for cmd actions and 300, 5 minutes for
+  /// wait actions).
+  maxTotalSeconds: Int?
+
+  /// Retry the command if it fails up to given number of times (default 0).
+  maxRetries: Int?
+
+  /// The working directory to run the command in (default is CWD).
+  dir: String?
+
+  /// Additional environment variables to set for the command.
+  env: Listing<String>?
+
+  /// The command to run. Must specify either cmd or wait for the action to do anything.
+  cmd: String?
+
+  /// (cmd only) Indicates a preference for a shell for the provided cmd to be executed in on supported
+  /// operating systems.
+  shell: Shell?
+
+  /// [Deprecated] (replaced by setVariables) (onDeploy/cmd only) The name of a variable to update with
+  /// the output of the command. This variable will be available to all remaining actions and components
+  /// in the package. This will be removed in Zarf v1.0.0.
+  setVariable: String(matches(Regex("^[A-Z0-9_]+$")))?
+
+  /// (onDeploy/cmd only) An array of variables to update with the output of the command. These variables
+  /// will be available to all remaining actions and components in the package.
+  setVariables: Listing<Variable>?
+
+  /// Description of the action to be displayed during package execution instead of the command.
+  description: String?
+
+  /// Wait for a condition to be met before continuing. Must specify either cmd or wait for the action.
+  /// See the 'zarf tools wait-for' command for more info.
+  wait: ZarfComponentActionWait?
+}
+
+/// ZarfComponentActionDefaults sets the default configs for child actions.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentActionDefaults {
+  /// Hide the output of commands during execution (default false).
+  mute: Boolean?
+
+  /// Default timeout in seconds for commands (default to 0, no timeout).
+  maxTotalSeconds: Int?
+
+  /// Retry commands given number of times if they fail (default 0).
+  maxRetries: Int?
+
+  /// Working directory for commands (default CWD).
+  dir: String?
+
+  /// Additional environment variables for commands.
+  env: Listing<String>?
+
+  /// (cmd only) Indicates a preference for a shell for the provided cmd to be executed in on supported
+  /// operating systems.
+  shell: Shell?
+}
+
+/// ZarfComponentActionSet is a set of actions to run during a zarf package operation.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentActionSet {
+  /// Default configuration for all actions in this set.
+  defaults: ZarfComponentActionDefaults?
+
+  /// Actions to run at the start of an operation.
+  before: Listing<ZarfComponentAction>?
+
+  /// Actions to run at the end of an operation.
+  after: Listing<ZarfComponentAction>?
+
+  /// Actions to run if all operations succeed.
+  onSuccess: Listing<ZarfComponentAction>?
+
+  /// Actions to run if all operations fail.
+  onFailure: Listing<ZarfComponentAction>?
+}
+
+/// ZarfComponentActionWait specifies a condition to wait for before continuing
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentActionWait {
+  /// Wait for a condition to be met in the cluster before continuing. Only one of cluster or network can
+  /// be specified.
+  cluster: ZarfComponentActionWaitCluster?
+
+  /// Wait for a condition to be met on the network before continuing. Only one of cluster or network can
+  /// be specified.
+  network: ZarfComponentActionWaitNetwork?
+}
+
+/// ZarfComponentActionWaitCluster specifies a condition to wait for before continuing
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentActionWaitCluster {
+  /// The kind of resource to wait for.
+  kind: String
+
+  /// The name of the resource or selector to wait for.
+  name: String
+
+  /// The namespace of the resource to wait for.
+  namespace: String?
+
+  /// The condition or jsonpath state to wait for; defaults to exist, a special condition that will wait
+  /// for the resource to exist.
+  condition: String?
+}
+
+/// ZarfComponentActionWaitNetwork specifies a condition to wait for before continuing
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentActionWaitNetwork {
+  /// The protocol to wait for.
+  protocol: "tcp"|"http"|"https"
+
+  /// The address to wait for.
+  address: String
+
+  /// The HTTP status code to wait for if using http or https.
+  code: Int?
+}
+
+/// ZarfComponentActions are ActionSets that map to different zarf package operations.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentActions {
+  /// Actions to run during package creation.
+  onCreate: ZarfComponentActionSet?
+
+  /// Actions to run during package deployment.
+  onDeploy: ZarfComponentActionSet?
+
+  /// Actions to run during package removal.
+  onRemove: ZarfComponentActionSet?
+}
+
+/// ZarfComponentImport structure for including imported Zarf components.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentImport {
+  /// The name of the component to import from the referenced zarf.yaml.
+  name: String?
+
+  /// The path to the directory containing the zarf.yaml to import.
+  path: String?
+
+  /// [beta] The URL to a Zarf package to import via OCI.
+  url: String(matches(Regex("^oci://.*$")))?
+}
+
+/// ZarfComponentOnlyCluster represents the architecture and K8s cluster distribution to filter on.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentOnlyCluster {
+  /// Only create and deploy to clusters of the given architecture.
+  architecture: ("amd64"|"arm64")?
+
+  /// A list of kubernetes distros this package works with (Reserved for future use).
+  distros: Listing<String>?
+}
+
+/// ZarfComponentOnlyTarget filters a component to only show it for a given local OS and cluster.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfComponentOnlyTarget {
+  /// Only deploy component to specified OS.
+  localOS: ("linux"|"darwin"|"windows")?
+
+  /// Only deploy component to specified clusters.
+  cluster: ZarfComponentOnlyCluster?
+
+  /// Only include this component when a matching '--flavor' is specified on 'zarf package create'.
+  flavor: String?
+}
+
+/// ZarfContainerTarget defines the destination info for a ZarfData target
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfContainerTarget {
+  /// The namespace to target for data injection.
+  namespace: String
+
+  /// The K8s selector to target for data injection.
+  selector: String
+
+  /// The container name to target for data injection.
+  container: String
+
+  /// The path within the container to copy the data into.
+  path: String
+}
+
+/// ZarfDataInjection is a data-injection definition.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfDataInjection {
+  /// Either a path to a local folder/file or a remote URL of a file to inject into the given target pod
+  /// + container.
+  source: String
+
+  /// The target pod + container to inject the data into.
+  target: ZarfContainerTarget
+
+  /// Compress the data before transmitting using gzip. Note: this requires support for tar/gzip locally
+  /// and in the target image.
+  compress: Boolean?
+}
+
+/// ZarfFile defines a file to deploy.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfFile {
+  /// Local folder or file path or remote URL to pull into the package.
+  source: String
+
+  /// (files only) Optional SHA256 checksum of the file.
+  shasum: String?
+
+  /// The absolute or relative path where the file or folder should be copied to during package deploy.
+  target: String
+
+  /// (files only) Determines if the file should be made executable during package deploy.
+  executable: Boolean?
+
+  /// List of symlinks to create during package deploy.
+  symlinks: Listing<String>?
+
+  /// Local folder or file to be extracted from a 'source' archive.
+  extractPath: String?
+}
+
+/// ZarfManifest defines raw manifests Zarf will deploy as a helm chart.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfManifest {
+  /// A name to give this collection of manifests; this will become the name of the dynamically-created
+  /// helm chart.
+  name: String
+
+  /// The namespace to deploy the manifests to.
+  namespace: String?
+
+  /// List of local K8s YAML files or remote URLs to deploy (in order).
+  files: Listing<String>?
+
+  /// Allow traversing directory above the current directory if needed for kustomization.
+  kustomizeAllowAnyDirectory: Boolean?
+
+  /// List of local kustomization paths or remote URLs to include in the package.
+  kustomizations: Listing<String>?
+
+  /// Whether to not wait for manifest resources to be ready before continuing.
+  noWait: Boolean?
+}
+
+/// ZarfMetadata lists information about the current ZarfPackage.
+///
+/// WARN: both properties and at least one of additionalProperties and patternProperties are set. This is
+/// ambiguously defined; can either be defined as a `Mapping` or a class.
+class ZarfMetadata {
+  /// Name to identify this Zarf package.
+  name: String(matches(Regex(#"^[a-z0-9][a-z0-9\-]*$"#)))
+
+  /// Additional information about this package.
+  description: String?
+
+  /// Generic string set by a package author to track the package version (Note: ZarfInitConfigs will
+  /// always be versioned to the CLIVersion they were created with).
+  version: String?
+
+  /// Link to package information when online.
+  url: String?
+
+  /// An image URL to embed in this package (Reserved for future use in Zarf UI).
+  image: String?
+
+  /// Disable compression of this package.
+  uncompressed: Boolean?
+
+  /// The target cluster architecture for this package.
+  architecture: String?
+
+  /// Yaml OnLy Online (YOLO): True enables deploying a Zarf package without first running zarf init
+  /// against the cluster. This is ideal for connected environments where you want to use existing VCS
+  /// and container registries.
+  yolo: Boolean?
+
+  /// Comma-separated list of package authors (including contact info).
+  authors: String?
+
+  /// Link to package documentation when online.
+  documentation: String?
+
+  /// Link to package source code when online.
+  source: String?
+
+  /// Name of the distributing entity, organization or individual.
+  vendor: String?
+
+  /// Checksum of a checksums.txt file that contains checksums all the layers within the package.
+  aggregateChecksum: String?
+
+  /// Annotations contains arbitrary metadata about the package. Users are encouraged to follow OCI
+  /// image-spec https://github.com/opencontainers/image-spec/blob/main/annotations.md
+  annotations: Mapping<String, String>?
+
+  /// AllowNamespaceOverride controls whether a package's namespace may be overridden.
+  allowNamespaceOverride: Boolean?
+}

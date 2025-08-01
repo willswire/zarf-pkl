@@ -1,0 +1,31 @@
+// Zarf package configuration in Pkl format
+// Uses amends for automatic schema validation without verbose typing
+
+amends "ZarfSchema.pkl"
+
+kind = "ZarfPackageConfig"
+
+metadata {
+  name = "podinfo"
+  description = "Go microservice template for Kubernetes"
+  version = "dev"
+  architecture = "amd64"
+}
+
+components {
+  new {
+    name = "podinfo"
+    required = true
+    charts {
+      new {
+        name = "podinfo"
+        version = "6.9.1"
+        namespace = "podinfo"
+        url = "oci://ghcr.io/stefanprodan/charts/podinfo"
+      }
+    }
+    images {
+      "ghcr.io/stefanprodan/podinfo:6.9.1"
+    }
+  }
+}
